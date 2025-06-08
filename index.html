@@ -368,7 +368,7 @@
                 const currentFixedCosts = scenario.newStock ? (fixedCosts + (vanDaily * operatingDays * 0.2)) : fixedCosts; // Slight increase in transport costs
                 
                 const maxRentals = (currentStock * operatingDays * scenario.utilization) / scenario.avgLength;
-                const revenue = maxRentals * scenario.price;
+                const revenue = maxRentals * scenario.price * scenario.avgLength;
                 const profit = revenue - currentFixedCosts;
                 const payback = profit > 0 ? (currentInvestment / profit).toFixed(1) : "∞";
                 const roi = ((profit / currentInvestment) * 100).toFixed(1);
