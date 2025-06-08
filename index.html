@@ -323,7 +323,7 @@
             // Calculate break-even
             const breakEvenRentals = Math.ceil(fixedCosts / avgRentalRevenue);
             const breakEvenDaily = Math.ceil(breakEvenRentals / operatingDays);
-            const requiredUtilization = Math.ceil((breakEvenDaily / stock) * 100);
+            const requiredUtilization = Math.ceil((breakEvenDaily / stock) * avgRentalRevenue * 100);
             
             // Current scenario
             const maxRentalsPerYear = stock * operatingDays * utilizationRate;
