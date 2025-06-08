@@ -223,7 +223,7 @@
                     <input type="number" id="utilizationRate" value="40" min="5" max="90">
                 </div>
                 <div class="input-item">
-                    <label for="rentalLength">Average Lenght</label>
+                    <label for="rentalLength">Average Length</label>
                     <input type="number" id="rentalLength" value="3" min="1" max="20">
                 </div>
             </div>
@@ -310,7 +310,10 @@
             const storageMonthly = parseFloat(document.getElementById('storageMonthly').value);
             const vanDaily = parseFloat(document.getElementById('vanDaily').value);
             const operatingDays = parseInt(document.getElementById('operatingDays').value);
+            const rentalLength = parseInt(document.getElementById('rentalLength').value);
             
+            const avgRentalRevenue = rentalLength * rentalPrice
+
             // Calculate costs
             const initialInvestment = stock * seatCost;
             const storageAnnual = storageMonthly * 12;
@@ -318,13 +321,13 @@
             const fixedCosts = salary + storageAnnual + vanAnnual;
             
             // Calculate break-even
-            const breakEvenRentals = Math.ceil(fixedCosts / rentalPrice);
+            const breakEvenRentals = Math.ceil(fixedCosts / avgRentalRevenue);
             const breakEvenDaily = Math.ceil(breakEvenRentals / operatingDays);
             const requiredUtilization = Math.ceil((breakEvenDaily / stock) * 100);
             
             // Current scenario
             const maxRentalsPerYear = stock * operatingDays * utilizationRate;
-            const currentRevenue = maxRentalsPerYear * rentalPrice;
+            const currentRevenue = maxRentalsPerYear * avgRentalRevenue;
             const currentProfit = currentRevenue - fixedCosts;
             const paybackPeriod = currentProfit > 0 ? (initialInvestment / currentProfit).toFixed(1) : "∞";
             
@@ -342,18 +345,18 @@
             document.getElementById('results').style.display = 'block';
             
             // Generate scenarios
-            generateScenarios(stock, seatCost, rentalPrice, salary, storageMonthly, vanDaily, operatingDays, fixedCosts, initialInvestment);
+            generateScenarios(stock, seatCost, rentalPrice, salary, storageMonthly, vanDaily, operatingDays, fixedCosts, initialInvestment, rentalLength);
             document.getElementById('scenarios').style.display = 'block';
         }
         
-        function generateScenarios(stock, seatCost, rentalPrice, salary, storageMonthly, vanDaily, operatingDays, fixedCosts, initialInvestment) {
+        function generateScenarios(stock, seatCost, rentalPrice, salary, storageMonthly, vanDaily, operatingDays, fixedCosts, initialInvestment, rentalLength) {
             const scenarios = [
-                { name: 'Conservative', utilization: 0.25, price: rentalPrice },
-                { name: 'Realistic', utilization: 0.40, price: rentalPrice },
-                { name: 'Optimistic', utilization: 0.60, price: rentalPrice },
-                { name: 'Premium Pricing', utilization: 0.40, price: rentalPrice * 1.3 },
-                { name: 'Expanded Fleet (40 seats)', utilization: 0.40, price: rentalPrice, newStock: 40 },
-                { name: 'Peak Season', utilization: 0.75, price: rentalPrice * 1.2 }
+                { name: 'Conservative', utilization: 0.25, price: rentalPrice , avgLength: rentalLength},
+                { name: 'Realistic', utilization: 0.40, price: rentalPrice , avgLength: rentalLength},
+                { name: 'Optimistic', utilization: 0.60, price: rentalPrice , avgLength: rentalLength},
+                { name: 'Premium Pricing', utilization: 0.40, price: rentalPrice * 1.3 , avgLength: rentalLength},
+                { name: 'Expanded Fleet (40 seats)', utilization: 0.40, price: rentalPrice, newStock: 40 , avgLength: rentalLength},
+                { name: 'Peak Season', utilization: 0.75, price: rentalPrice * 1.2 , avgLength: rentalLength * 1.2}
             ];
             
             const scenarioGrid = document.getElementById('scenarioGrid');
@@ -364,7 +367,7 @@
                 const currentInvestment = scenario.newStock ? (scenario.newStock * seatCost) : initialInvestment;
                 const currentFixedCosts = scenario.newStock ? (fixedCosts + (vanDaily * operatingDays * 0.2)) : fixedCosts; // Slight increase in transport costs
                 
-                const maxRentals = currentStock * operatingDays * scenario.utilization;
+                const maxRentals = (currentStock * operatingDays * scenario.utilization) / scenario.avgLength;
                 const revenue = maxRentals * scenario.price;
                 const profit = revenue - currentFixedCosts;
                 const payback = profit > 0 ? (currentInvestment / profit).toFixed(1) : "∞";
